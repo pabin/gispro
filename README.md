@@ -1,4 +1,4 @@
-# gispro setup
+# Gispro Setup
 
 git clone https://github.com/pabin/gispro
 
