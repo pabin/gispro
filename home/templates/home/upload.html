@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-12">
+      <form class="" role="form" method="post">
+          {% csrf_token %}
+        <h2 style="text-align: center;">Upload Image</h2><br>
+        {% for field in form %}
+        <div class="row">
+          <div class="col-md-2">
+          </div>
+
+            <div class="col-sm-2">
+                <label>{{field.label}}</label>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group {% if field.errors %}has-error{% endif %}">
+                    {{ field }} {% if field.errors %}
+                    <span class="help-block">{{ field.errors.as_text }}</span> {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-2">
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="row">
+          <div class="col-md-2">
+          </div>
+          <div class="col-md-6">
+              <button type="submit" class="btn btn-primary float-right">Submit</button>
+          </div>
+          <div class="col-md-2">
+          </div>
+        </div>
+    </form>
+
+  </div>
+</div>
+{% endblock content%}
