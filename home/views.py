@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.views import View
 import requests
-import cv2
-
+import cv2 as cv
+import numpy as np
+import matplotlib.pyplot as plt
 
 from .forms import (
     CoordinateEntryForm,
@@ -17,11 +18,49 @@ from .models import(
     GoogleMapImage,
 )
 
+import argparse
+import os
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+from django.conf import settings
+
+image_path = settings.MEDIA_ROOT + 'images/'
+file_path = settings.STATIC_ROOT
+
 class HomeView(View):
     template_name = 'home/home.html'
     form_class = CoordinateEntryForm
 
     def get(self, request):
+        # my_image = "Newphoto.png"
+        my_image = "prl.JPG"
+
+        print(file_path, 'file_path....')
+
+        # face_cascade = cv.CascadeClassifier("/home/raj/PythonProjects/GIS/gispro/static/haarcascade_frontalface.xml")
+        # eyes_cascade = cv.CascadeClassifier("/home/raj/PythonProjects/GIS/gispro/static/haarcascade_eye.xml")
+
+        face_cascade = cv.CascadeClassifier("/home/raj/PythonProjects/GIS/env/lib/python3.5/site-packages/cv2/data/haarcascade_frontalface_alt.xml")
+        eye_cascade = cv.CascadeClassifier("/home/raj/PythonProjects/GIS/env/lib/python3.5/site-packages/cv2/data/haarcascade_eye.xml")
+
+        img = cv.imread(image_path+my_image)
+        gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+        faces = face_cascade.detectMultiScale(gray, 1.5, 5)
+        print(faces, 'faces...')
+        for (x,y,w,h) in faces:
+            cv.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+            roi_gray = gray[y:y+h, x:x+w]
+            roi_color = img[y:y+h, x:x+w]
+            eyes = eye_cascade.detectMultiScale(roi_gray)
+            for (ex,ey,ew,eh) in eyes:
+                cv.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
+        cv.imshow('img',img)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+
+
         form = self.form_class()
         context = {
         'form': form,
@@ -49,12 +88,48 @@ class HomeView(View):
                 print("Could not generate the image - try adjusting the zoom level and checking your coordinates")
             else:
                 #Save the image to disk
-                img.save("img_"+str(lat)+"_"+str(lng)+"_zoom_"+str(zoom)+"_.png")
-                print("The map has been successfully created")
+                img_name = "img_"+str(lat)+"_"+str(lng)+"_zoom_"+str(zoom)+"_.png"
+                img.save(image_path+img_name)
+
+                new_img = cv.imread(image_path+img_name)
+                print(new_img, 'this is from google map..')
+
+                context['success'] = True
+                my_image = "img_40.072_-82.88_zoom_19_.png"
+                context['image_url'] = image_path+my_image
+                return render(request, self.template_name, context)
+
+        my_image = "Newphoto.png"
+
+        # img = cv.imread(image_path+my_image)
+        # cv.line(img, (0,0), (150,150), (255, 255, 255), 15)
+        # cv.rectangle(img, (15, 25), (200, 155), (0, 255, 0), 5)
+        # cv.imshow('image', img)
+        # cv.waitKey(0)
+        # cv.destroAllWindows()
+
+        print(file_path, 'file_path....')
+        face_cascade = cv.CascadeClassifier(file_path+"haarcascade_frontalface_default.xml")
+        eye_cascade = cv.CascadeClassifier(file_path+'haarcascade_eye.xml')
+        img = cv.imread(image_path+my_image)
+        gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+        faces = face_cascade.detectMultiScale(gray, 1.5, 5)
+        print(faces, 'faces...')
+        for (x,y,w,h) in faces:
+            cv.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+            roi_gray = gray[y:y+h, x:x+w]
+            roi_color = img[y:y+h, x:x+w]
+            eyes = eye_cascade.detectMultiScale(roi_gray)
+            for (ex,ey,ew,eh) in eyes:
+                cv.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
+        cv.imshow('img',img)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
 
 
-            return render(request, self.template_name, context)
-
+        context['image_url'] = image_path+my_image
+        context['success'] = True
         return render(request, self.template_name, context)
 
 
@@ -65,6 +140,13 @@ class ImageIdentification(View):
     form_class = ImageUploadForm
 
     def get(self, request):
+        # print(image_path, 'image_path...')
+        img = cv.imread(image_path+"/123.png", cv.IMREAD_GRAYSCALE)
+        print(img, 'img...')
+
+
+
+
         form = self.form_class()
         context = {
         'form': form,
