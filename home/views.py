@@ -18,6 +18,10 @@ from .models import(
     GoogleMapImage,
 )
 
+from .detector import (
+    _object_detector
+)
+
 import argparse
 import os
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -33,34 +37,6 @@ class HomeView(View):
     form_class = CoordinateEntryForm
 
     def get(self, request):
-        # my_image = "Newphoto.png"
-        my_image = "prl.JPG"
-
-        print(file_path, 'file_path....')
-
-        # face_cascade = cv.CascadeClassifier("/home/raj/PythonProjects/GIS/gispro/static/haarcascade_frontalface.xml")
-        # eyes_cascade = cv.CascadeClassifier("/home/raj/PythonProjects/GIS/gispro/static/haarcascade_eye.xml")
-
-        face_cascade = cv.CascadeClassifier("/home/raj/PythonProjects/GIS/env/lib/python3.5/site-packages/cv2/data/haarcascade_frontalface_alt.xml")
-        eye_cascade = cv.CascadeClassifier("/home/raj/PythonProjects/GIS/env/lib/python3.5/site-packages/cv2/data/haarcascade_eye.xml")
-
-        img = cv.imread(image_path+my_image)
-        gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-
-        faces = face_cascade.detectMultiScale(gray, 1.5, 5)
-        print(faces, 'faces...')
-        for (x,y,w,h) in faces:
-            cv.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
-            roi_gray = gray[y:y+h, x:x+w]
-            roi_color = img[y:y+h, x:x+w]
-            eyes = eye_cascade.detectMultiScale(roi_gray)
-            for (ex,ey,ew,eh) in eyes:
-                cv.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
-        cv.imshow('img',img)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
-
-
         form = self.form_class()
         context = {
         'form': form,
@@ -108,26 +84,6 @@ class HomeView(View):
         # cv.waitKey(0)
         # cv.destroAllWindows()
 
-        print(file_path, 'file_path....')
-        face_cascade = cv.CascadeClassifier(file_path+"haarcascade_frontalface_default.xml")
-        eye_cascade = cv.CascadeClassifier(file_path+'haarcascade_eye.xml')
-        img = cv.imread(image_path+my_image)
-        gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-
-        faces = face_cascade.detectMultiScale(gray, 1.5, 5)
-        print(faces, 'faces...')
-        for (x,y,w,h) in faces:
-            cv.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
-            roi_gray = gray[y:y+h, x:x+w]
-            roi_color = img[y:y+h, x:x+w]
-            eyes = eye_cascade.detectMultiScale(roi_gray)
-            for (ex,ey,ew,eh) in eyes:
-                cv.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
-        cv.imshow('img',img)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
-
-
         context['image_url'] = image_path+my_image
         context['success'] = True
         return render(request, self.template_name, context)
@@ -167,4 +123,40 @@ class ImageIdentification(View):
             return render(request, self.template_name, context)
 
         print('Error')
+        return render(request, self.template_name, context)
+
+
+
+class ObjectDetectionTest(View):
+    template_name = 'home/detection.html'
+
+    def get(self, request):
+
+        _object_detector()
+        # my_image = "Newphoto.png"
+        # my_image = "prl.JPG"
+        #
+        # face_cascade = cv.CascadeClassifier("/home/raj/PythonProjects/GIS/env/lib/python3.5/site-packages/cv2/data/haarcascade_frontalface_alt.xml")
+        # eye_cascade = cv.CascadeClassifier("/home/raj/PythonProjects/GIS/env/lib/python3.5/site-packages/cv2/data/haarcascade_eye.xml")
+        #
+        # img = cv.imread(image_path+my_image)
+        # gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        #
+        # faces = face_cascade.detectMultiScale(gray, 1.5, 5)
+        # print(faces, 'faces...')
+        # for (x,y,w,h) in faces:
+        #     cv.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+        #     roi_gray = gray[y:y+h, x:x+w]
+        #     roi_color = img[y:y+h, x:x+w]
+        #     eyes = eye_cascade.detectMultiScale(roi_gray)
+        #     for (ex,ey,ew,eh) in eyes:
+        #         cv.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
+        # cv.imshow('img',img)
+        # cv.waitKey(0)
+        # cv.destroyAllWindows()
+
+
+        context = {
+        'title': 'Object Detection',
+        }
         return render(request, self.template_name, context)
