@@ -10,7 +10,6 @@ pip install -r requirements.txt
 
 cd gispro
 
-
 python3 migrate
 
 python manage.py runserver
