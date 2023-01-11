@@ -9,4 +9,6 @@ __pycache__/
 *.less
 *.scss
 
-
+# Database stuff
+*.sqlite3
+db.sqlite3
